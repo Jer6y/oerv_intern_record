@@ -2,7 +2,13 @@
 
 **源仓库链接：**[UniProton: A lightweight real-time operating system (gitee.com)](https://gitee.com/openeuler/UniProton)
 
+### 此文档相关的内容仅仅作为本人的最新更进日志，以及一些心得和吐槽
 
+### 可能会带有当天的情绪什么的，慎入！！！！
+
+### 宇宙超级无敌免责声明： 以下所有内容均不代表我对UniProton项目的个人评价
+
+### [更技术向的解析移植文档请移步此处](UniProton_technic.md)
 
 ## 2024-01-07
 
