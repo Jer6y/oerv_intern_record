@@ -285,10 +285,101 @@
 
 
 
+## 公共模块 -  ERROR模块
+
+- **所在文件		     : **  `src/include/uapi/prt_err.h`  `src/om/err/*` `src/om/include/prt_err_external.h`
+
+- **库作用		        ：** 
+
+- **依赖库或依赖模块     ：** [prt_typedef](#公共库 - 类型库)  [prt_module](#公共库 - 模块库) [prt_attr](#公共库 - 编译器段属性定义库)  [prt_cpu](#公共库 - CPU资源定义库) prt_task [prt_hook](#公共模块 - hook模块) prt_exc
+
+- **所有定义**
+
+  - | 接口                               | 意义                                                         |
+    | ---------------------------------- | ------------------------------------------------------------ |
+    | PRT_ErrRegHook(ErrHandleFunc hook) | [PORT TO USER] 注册ERR模块处理的回调函数，注册到HOOK模块里去 |
+    |                                    | 注册的回调函数类型为单钩回调                                 |
+    | PRT_ErrHandle()                    | [PORT TO USER] 用户调用的错误处理函数                        |
+    | OsErrRecord()                      | [PORT TO OTHER KENEL]                                        |
+    |                                    | 若当前发生错误是在任务中，则记录到任务的ERRNO中              |
+    | OS_ERR_RECORD()                    | [PORT TO OTHER KENEL]                                        |
+    |                                    | 将错误码记录到ERROR模块的数据结构里，而不是任务的ERRNO中     |
+    | OS_REPORT_ERROR()                  | [PORT TO OTHER KENEL]                                        |
+    |                                    | 若当前发生错误是在任务中，则记录到任务的ERRNO中 ,与 OsErrRecord |
+    |                                    | 不同的是，会执行用户的回调钩子，同时严重错误时会引起异常，触发EXC模块 |
+
+- **模块`UML`图及与其他模块的耦合**
+
+  - ![](pic/prt_err.png)
+
+
+
+
+
+
+
+
+
 ## 公共库 - 内存库
 
-- **所在文件		     : **  `src/include/uapi/prt_mem.h` 
+- **所在文件		     : **  `src/include/uapi/prt_mem.h`  `src/mem/*`
 
-- **库作用		        ：** 定义一系列制作错误码的宏，包括制作不同级别，不同模块的错误码
-- **依赖库或依赖模块     ：** [prt_typedef](#公共库 - 类型库)  [prt_module](#公共库 - 模块库)
+- **库作用		        ：** 用户配置初始化后，作为基础内存分配库存在于众内核间
+- **依赖库或依赖模块     ：** [prt_typedef](#公共库 - 类型库)  [prt_module](#公共库 - 模块库) [prt_attr](#公共库 - 编译器段属性定义库)  [prt_cpu](#公共库 - CPU资源定义库)
 - **所有定义**
+
+  - | 接口              | 意义                                                         |
+    | ----------------- | ------------------------------------------------------------ |
+    | PRT_MemAlloc      | 在分区号为ptNo的分区中，申请大小为size的内存。【实际没有实现分区号和模块号】 |
+    | PRT_MemAllocAlign | 在分区号为ptNo的分区中，申请大小为size的内存，对齐方式为alignPow |
+    | PRT_MemFree       | 该接口根据内存块的地址addr，                                 |
+    | 以上接口为        | PORT TO USER 的接口                                          |
+    | OsMemAllocAlign   | 在分区号为ptNo的分区中，申请大小为size的内存，对齐方式为alignPow |
+    | OsMemAlloc        | 在分区号为ptNo的分区中，申请大小为size的内存。               |
+    | 以上接口为        | PORT TO KERNEL的接口                                         |
+
+- **模块`UML`图及与其他模块的耦合**
+
+  - 
+
+
+
+
+
+
+## [公共模块 - hook模块](UniProton_hook_module.md)
+
+- **所在文件		     : **  `src/include/uapi/prt_hook.h` `src/om/hook/*` `src/om/include/hook_external.h` 
+
+- **库作用		         ：** 内部维护了与钩子有关的数据结构，可以注册某个模块多个钩子或者单个钩子，使用提供的API激活钩子
+
+- **注意事项		     ：** **有些历史年代了，有些数据结构未使用过，等等**
+
+- **依赖库或依赖模块      ：** [prt_typedef](#公共库 - 类型库)  [prt_module](#公共库 - 模块库) [prt_mem](#公共库 - 内存库) [prt_attr](#公共库 - 编译器段属性定义库)  [prt_cpu](#公共库 - CPU资源定义库)
+
+- **所有API【其他模块使用的，这个模块的API不能被用户使用**
+
+  - | API                                       | 意义                                                |
+    | ----------------------------------------- | --------------------------------------------------- |
+    | OsMhookAdd                                | 多钩子添加内部接口                                  |
+    | OsMhookDel                                | 多钩子删除内部接口                                  |
+    | OsHookAdd                                 | 钩子添加内部接口                                    |
+    | OsHookDel                                 | 钩子删除内部接口                                    |
+    | OsShookReg                                | 单钩子注册内部接口，                                |
+    | OsMhookReserve                            | 在注册阶段，不同模块通过osMhookReserve接口预留钩子, |
+    | OS_SHOOK_ACTIVATE_PARA0(hookType)         | 激活hookType的单钩子,参数为0个                      |
+    | OS_SHOOK_ACTIVATE_PARA1(hookType,param_1) | 激活hookType的单钩子,参数为1个                      |
+    | OS_SHOOK_ACTIVATE_PARA2(hookType,...)     | 激活hookType的单钩子,参数为2个                      |
+    | OS_SHOOK_ACTIVATE_PARA3(hookType,...)     | 激活hookType的单钩子,参数为3个                      |
+    | OS_SHOOK_ACTIVATE_PARA4(hookType,...)     | 激活hookType的单钩子,参数为4个                      |
+    | OS_SHOOK_ACTIVATE_PARA5(hookType,...)     | 激活hookType的单钩子,参数为5个                      |
+    | OS_MHOOK_ACTIVATE_PARA0(hookType)         | 激活hookType的多钩子,参数为0个                      |
+    | ...                                       |                                                     |
+    | OS_MHOOK_ACTIVATE_PARA5(hookType,...)     | 激活hookType的多钩子,参数为5个                      |
+
+    
+
+- **模块`UML`图及与其他模块的耦合**
+
+  - ![](pic/prt_hook.png)
+
