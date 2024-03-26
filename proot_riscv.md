@@ -15,4 +15,13 @@
 - 今日完成进度
   - 整理完成 mem, reg 等通用的库 ，【将ptrace  peek, poke data peek,poke register 重新封装新API的库】
 - 预计明日进度
-  - 整理event相关的处理 
+  - 整理event相关的处理
+
+#### 2024-03-26 
+
+- 今日完成进度
+  - 整理了reg相关的 ptrace与架构相关的库函数，把对reg 的操作进行了替换，使用到了一些linux下关于架构的头文件定义
+  - 【proot对结构体的命名方式是真的裂开，要破防哩】
+  - 前有结构体里面来个 bindings 成员， 后马上来了个bingds结构体，关键是 。。。 用了typedef ，结构体定义好了后不再使用struct 了， 然后悄悄摸摸的偷偷的定义一些结构体， typedef tracee ... Tracee。 两个混着用， 后又出现了 Sysnums sysnums ，，，，  非常好代码，要破防哩
+- 预计明日进度
+  - 继续整理reg 和 mem , 以及理解一些常见系统调用的fake 处理1
